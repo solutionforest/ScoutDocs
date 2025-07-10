@@ -1,0 +1,14 @@
+This is a test document for the Document Search API Engine.
+
+The system can extract text from various file formats including:
+- PDF files
+- Microsoft Word documents (DOC/DOCX)
+- Plain text files
+
+Key features:
+- Full-text search with TNT Search
+- Document upload and management
+- Search result ranking and snippets
+- Multiple file format support
+
+This content will be indexed and searchable through the API endpoints.

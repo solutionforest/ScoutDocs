@@ -1,0 +1,22 @@
+Laravel Framework Documentation
+
+Introduction
+Laravel is a web application framework with expressive, elegant syntax. We've already laid the foundation — freeing you to create without sweating the small things.
+
+Getting Started
+- Installation
+- Configuration 
+- Directory Structure
+
+Features
+- Routing
+- Middleware
+- Controllers
+- Views
+- Blade Templates
+- Database
+- Eloquent ORM
+- Migrations
+- Artisan Commands
+
+This document contains information about Laravel development and best practices.

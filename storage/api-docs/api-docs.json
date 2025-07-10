@@ -1,0 +1,1705 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Document Search API",
+        "description": "A powerful document search API engine using TNT Search for fast full-text search capabilities. This API supports multi-tenant workspaces, document upload, text extraction, and advanced search features.",
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://my-default-host.com",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/documents": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "List all documents",
+                "description": "Get a paginated list of all documents in the workspace",
+                "operationId": "getDocuments",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "description": "Filter by project ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Document"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Upload a new document",
+                "description": "Upload a document file to the workspace and automatically extract text content for search indexing",
+                "operationId": "storeDocument",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "file": {
+                                        "description": "Document file to upload",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "title": {
+                                        "description": "Optional document title",
+                                        "type": "string",
+                                        "example": "Quarterly Report"
+                                    },
+                                    "project_id": {
+                                        "description": "Optional project ID to associate with document",
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Document"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/documents/{id}": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Get a specific document",
+                "description": "Retrieve details of a specific document by ID",
+                "operationId": "getDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Document ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Document"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Document not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Update a document",
+                "description": "Update document title or content",
+                "operationId": "updateDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Document ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Updated Document Title"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Updated document content"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Document updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Document"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Document not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Delete a document",
+                "description": "Delete a document and remove it from search index",
+                "operationId": "deleteDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Document ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Document not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/documents/{id}/download": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Download document file",
+                "description": "Download the original file of a document",
+                "operationId": "downloadDocument",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Document ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Document file download",
+                        "content": {
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Document or file not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/documents-statistics": {
+            "get": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Get document statistics",
+                "description": "Get statistical information about documents in the workspace",
+                "operationId": "getDocumentStatistics",
+                "responses": {
+                    "200": {
+                        "description": "Document statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "total_documents": {
+                                                            "type": "integer",
+                                                            "example": 150
+                                                        },
+                                                        "indexed_documents": {
+                                                            "type": "integer",
+                                                            "example": 145
+                                                        },
+                                                        "total_size": {
+                                                            "type": "integer",
+                                                            "example": 52428800
+                                                        },
+                                                        "formatted_total_size": {
+                                                            "type": "string",
+                                                            "example": "50 MB"
+                                                        },
+                                                        "file_types": {
+                                                            "type": "object"
+                                                        },
+                                                        "recent_uploads": {
+                                                            "type": "integer",
+                                                            "example": 15
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/documents-bulk-index": {
+            "post": {
+                "tags": [
+                    "Documents"
+                ],
+                "summary": "Bulk index documents",
+                "description": "Index all unindexed documents in the workspace for search",
+                "operationId": "bulkIndexDocuments",
+                "responses": {
+                    "200": {
+                        "description": "Documents indexed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "indexed_count": {
+                                                            "type": "integer",
+                                                            "example": 25
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/index/status": {
+            "get": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Get search index status",
+                "description": "Get the current status of the search index for the workspace",
+                "operationId": "getIndexStatus",
+                "responses": {
+                    "200": {
+                        "description": "Index status information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "indexed_documents": {
+                                                            "type": "integer",
+                                                            "example": 145
+                                                        },
+                                                        "total_documents": {
+                                                            "type": "integer",
+                                                            "example": 150
+                                                        },
+                                                        "index_size": {
+                                                            "type": "integer",
+                                                            "example": 2048576
+                                                        },
+                                                        "formatted_index_size": {
+                                                            "type": "string",
+                                                            "example": "2 MB"
+                                                        },
+                                                        "last_updated": {
+                                                            "type": "string",
+                                                            "format": "date-time"
+                                                        },
+                                                        "index_health": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "healthy",
+                                                                "warning",
+                                                                "error"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/index/rebuild": {
+            "post": {
+                "tags": [
+                    "Index"
+                ],
+                "summary": "Rebuild search index",
+                "description": "Rebuild the entire search index for the workspace",
+                "operationId": "rebuildIndex",
+                "responses": {
+                    "200": {
+                        "description": "Index rebuilt successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "indexed_documents": {
+                                                            "type": "integer",
+                                                            "example": 150
+                                                        },
+                                                        "processing_time": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 45.23
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/projects": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "List all projects in workspace",
+                "description": "Get a paginated list of all projects in the workspace",
+                "operationId": "getProjects",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Project"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Create a new project",
+                "description": "Create a new project in the workspace",
+                "operationId": "storeProject",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Project name",
+                                        "type": "string",
+                                        "example": "Marketing Materials"
+                                    },
+                                    "description": {
+                                        "description": "Project description",
+                                        "type": "string",
+                                        "example": "All marketing related documents"
+                                    },
+                                    "color": {
+                                        "description": "Hex color for UI",
+                                        "type": "string",
+                                        "example": "#3B82F6"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Project created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/projects/{id}": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get a specific project",
+                "description": "Retrieve details of a specific project by ID",
+                "operationId": "getProject",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "$ref": "#/components/schemas/Project"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/projects/{id}/statistics": {
+            "get": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Get project statistics",
+                "description": "Get detailed statistics for a specific project",
+                "operationId": "getProjectStatistics",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Project ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Project statistics",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "total_documents": {
+                                                            "type": "integer"
+                                                        },
+                                                        "indexed_documents": {
+                                                            "type": "integer"
+                                                        },
+                                                        "unindexed_documents": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total_size": {
+                                                            "type": "integer"
+                                                        },
+                                                        "formatted_total_size": {
+                                                            "type": "string"
+                                                        },
+                                                        "recent_uploads": {
+                                                            "type": "integer"
+                                                        },
+                                                        "file_types": {
+                                                            "type": "object"
+                                                        },
+                                                        "last_indexed_at": {
+                                                            "type": "string",
+                                                            "format": "date-time",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Search documents",
+                "description": "Search for documents using full-text search with filters",
+                "operationId": "searchDocuments",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "annual report"
+                        }
+                    },
+                    {
+                        "name": "file_type",
+                        "in": "query",
+                        "description": "Filter by file type",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pdf",
+                                "doc",
+                                "docx",
+                                "txt"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date_from",
+                        "in": "query",
+                        "description": "Filter documents from date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "date_to",
+                        "in": "query",
+                        "description": "Filter documents to date",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "results": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/SearchResult"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        },
+                                                        "query": {
+                                                            "type": "string"
+                                                        },
+                                                        "total_found": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/search/advanced": {
+            "post": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Advanced document search",
+                "description": "Perform advanced search with multiple filters and sorting options",
+                "operationId": "advancedSearchDocuments",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "query"
+                                ],
+                                "properties": {
+                                    "query": {
+                                        "type": "string",
+                                        "example": "financial report growth"
+                                    },
+                                    "filters": {
+                                        "properties": {
+                                            "file_type": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "pdf",
+                                                        "doc",
+                                                        "docx",
+                                                        "txt"
+                                                    ]
+                                                }
+                                            },
+                                            "date_from": {
+                                                "type": "string",
+                                                "format": "date"
+                                            },
+                                            "date_to": {
+                                                "type": "string",
+                                                "format": "date"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "sort": {
+                                        "type": "string",
+                                        "default": "relevance",
+                                        "enum": [
+                                            "relevance",
+                                            "date_desc",
+                                            "date_asc",
+                                            "title_asc",
+                                            "title_desc",
+                                            "size_desc",
+                                            "size_asc"
+                                        ]
+                                    },
+                                    "page": {
+                                        "type": "integer",
+                                        "default": 1,
+                                        "minimum": 1
+                                    },
+                                    "per_page": {
+                                        "type": "integer",
+                                        "default": 10,
+                                        "maximum": 100,
+                                        "minimum": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Advanced search results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "results": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/SearchResult"
+                                                            }
+                                                        },
+                                                        "pagination": {
+                                                            "$ref": "#/components/schemas/Pagination"
+                                                        },
+                                                        "query": {
+                                                            "type": "string"
+                                                        },
+                                                        "filters": {
+                                                            "type": "object"
+                                                        },
+                                                        "sort": {
+                                                            "type": "string"
+                                                        },
+                                                        "total_found": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        },
+        "/api/search/suggestions": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Get search suggestions",
+                "description": "Get search term suggestions based on indexed content",
+                "operationId": "getSearchSuggestions",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Partial search query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "annu"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of suggestions",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 5,
+                            "maximum": 20,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Search suggestions",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/ApiResponse"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "properties": {
+                                                        "suggestions": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "query": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "WorkspaceKey": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Document": {
+                "required": [
+                    "id",
+                    "title",
+                    "file_type",
+                    "created_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Annual Report 2024"
+                    },
+                    "file_type": {
+                        "type": "string",
+                        "example": "pdf"
+                    },
+                    "file_size": {
+                        "type": "integer",
+                        "example": 2048576
+                    },
+                    "formatted_file_size": {
+                        "type": "string",
+                        "example": "2 MB"
+                    },
+                    "original_filename": {
+                        "type": "string",
+                        "example": "annual_report_2024.pdf"
+                    },
+                    "indexed": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "indexed_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SearchResult": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Annual Report 2024"
+                    },
+                    "snippet": {
+                        "type": "string",
+                        "example": "The company achieved remarkable <mark>growth</mark> in revenue..."
+                    },
+                    "file_type": {
+                        "type": "string",
+                        "example": "pdf"
+                    },
+                    "file_size": {
+                        "type": "integer",
+                        "example": 2048576
+                    },
+                    "formatted_file_size": {
+                        "type": "string",
+                        "example": "2 MB"
+                    },
+                    "original_filename": {
+                        "type": "string",
+                        "example": "annual_report_2024.pdf"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "score": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0.95
+                    }
+                },
+                "type": "object"
+            },
+            "ApiResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean"
+                    },
+                    "message": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "data": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Error description"
+                    },
+                    "error": {
+                        "type": "string",
+                        "example": "Detailed error message"
+                    }
+                },
+                "type": "object"
+            },
+            "Pagination": {
+                "properties": {
+                    "total": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "from": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "to": {
+                        "type": "integer",
+                        "example": 10
+                    }
+                },
+                "type": "object"
+            },
+            "Project": {
+                "title": "Project",
+                "description": "Project model",
+                "properties": {
+                    "id": {
+                        "description": "Project ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "workspace_id": {
+                        "description": "Workspace ID",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Project name",
+                        "type": "string",
+                        "example": "My Project"
+                    },
+                    "slug": {
+                        "description": "Project slug",
+                        "type": "string",
+                        "example": "my-project"
+                    },
+                    "description": {
+                        "description": "Project description",
+                        "type": "string",
+                        "example": "A sample project for document management",
+                        "nullable": true
+                    },
+                    "color": {
+                        "description": "Project color (hex code)",
+                        "type": "string",
+                        "example": "#007bff",
+                        "nullable": true
+                    },
+                    "is_active": {
+                        "description": "Whether the project is active",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "settings": {
+                        "description": "Project settings (JSON object)",
+                        "type": "object",
+                        "example": {
+                            "indexing_enabled": true,
+                            "auto_extract": false
+                        },
+                        "nullable": true
+                    },
+                    "last_indexed_at": {
+                        "description": "Last indexing timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00Z",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "Creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-01T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "description": "Last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "WorkspaceKey": {
+                "type": "apiKey",
+                "description": "Workspace API key for authentication",
+                "name": "X-Workspace-Key",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Documents",
+            "description": "Document management operations"
+        },
+        {
+            "name": "Search",
+            "description": "Document search operations"
+        },
+        {
+            "name": "Index",
+            "description": "Search index management"
+        },
+        {
+            "name": "Projects",
+            "description": "Projects"
+        }
+    ]
+}
