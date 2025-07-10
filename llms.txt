@@ -1,0 +1,1 @@
+DocuScope is a Laravel-based, multi-tenant document search API engine. It supports workspaces, projects, and documents, with fast full-text search, advanced filtering, and secure document management. The API is documented with OpenAPI and includes a built-in test interface.

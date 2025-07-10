@@ -1,0 +1,34 @@
+# DocuScope - Project Summary for AI
+
+DocuScope is a Laravel-based, multi-tenant document search API engine using TNT Search for fast full-text search. It features:
+
+- Workspace and project management for organizing document collections
+- Support for PDF, DOC, DOCX, and TXT files
+- Full CRUD for documents
+- Advanced search with filters (file type, date, project, etc.)
+- Search suggestions and highlighted snippets
+- Index management (status, rebuild)
+- OpenAPI documentation (Swagger UI)
+- Built-in Vue.js test interface for API exploration
+
+## Main Entities
+- **Workspace**: Top-level tenant container
+- **Project**: Group of related documents within a workspace
+- **Document**: File with extracted content and metadata
+
+## Example Endpoints
+- `GET /api/workspaces` - List workspaces
+- `POST /api/workspaces/{workspace}/documents` - Upload document
+- `GET /api/workspaces/{workspace}/search` - Search documents
+- `POST /api/workspaces/{workspace}/index/rebuild` - Rebuild index
+
+## Usage
+- Organize documents by workspace and project
+- Upload, search, and manage documents via API
+- Use the test interface at `/test` for manual API testing
+
+## Security & Performance
+- File validation, access control, and rate limiting
+- Asynchronous indexing and search result caching
+
+See README.md and DOCUMENT_SEARCH_GUIDE.md for full details.
