@@ -1,3 +1,5 @@
+<p align="center"><img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/88e9671e-9ea5-4184-8fb3-0b4ff1e275ff" /></p>
+
 # Document Search API Engine
 
 A Laravel-based document search API engine using TNT Search for fast full-text search capabilities. Features workspace and project management for organized document collections.
