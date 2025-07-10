@@ -57,9 +57,19 @@ php artisan serve
 
 Visit `http://localhost:8000/api/documentation` to access the interactive Swagger UI with complete API documentation.
 
+<img width="2988" height="3634" alt="screencapture-localhost-8000-api-documentation-2025-07-10-21_45_31" src="https://github.com/user-attachments/assets/71fc8371-d5ec-486f-ba52-bb26fcf8464b" />
+
+
 ### 3. Test Interface
 
 A simple test interface is available at `http://localhost:8000/test` for trying out the API endpoints.
+
+Password check your environment variable
+
+<img width="966" height="777" alt="image" src="https://github.com/user-attachments/assets/e06927fa-a631-469d-bf93-c49e0278b805" />
+
+<img width="2988" height="6024" alt="screencapture-localhost-8000-test-2025-07-10-21_44_12" src="https://github.com/user-attachments/assets/9aec4b5d-110a-43d9-b9ef-17f8f0814dca" />
+
 
 ### 4. API Endpoints
 
@@ -201,6 +211,10 @@ TNTSEARCH_MAX_DOCS=1000
 # API Documentation
 L5_SWAGGER_GENERATE_ALWAYS=false
 L5_SWAGGER_CONST_HOST=localhost:8000
+
+# Test Interface Area Setting
+TEST_INTERFACE_ENABLED=true
+TEST_INTERFACE_PASSWORD=admin123
 ```
 
 ## Testing
