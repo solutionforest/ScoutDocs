@@ -2,6 +2,12 @@
 
 A Laravel-based document search API engine using TNT Search for fast full-text search capabilities. Features workspace and project management for organized document collections.
 
+> ⚠️ **WARNING: DEVELOPMENT STATUS**⚠️ 
+> 
+> This package is currently under active development and is **NOT READY FOR PRODUCTION USE**. 
+> 
+> Features may be incomplete, APIs might change, and there could be breaking changes. Use at your own risk in development environments only.
+
 ## Features
 
 - **Workspace Management**: Multi-tenant workspace organization
